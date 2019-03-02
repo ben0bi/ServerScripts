@@ -3,30 +3,11 @@
 import math
 import spidev as SPI                # where the display connects
 from PIL import Image, ImageDraw, ImageFont  # PIL - PythonImageLibrary
+import subprocess # for getting the up time.
 import time, datetime, sys, signal, urllib, requests, random
 from StringIO import StringIO
 
 from EPD_driver import EPD_driver
-
-class point():
-	x = 0
-	y = 0
-	def __init__(self, x, y):
-		self.x = x
-		self.y = y
-	def __add__(self, other):
-		x = self.x + other.x
-		y = self.y + other.y
-	def __sub__(self, other):
-		x = self.x - other.x
-		y = self.y - other.y
-	def __str__(self):
-		return '[x:{0}, y:{1}'.format(self.x, self.y)
-	def offsetByVector(self, angle, length):
-		x = int(cos(angle) * length) + self.x
-		y = int(cos(angle) * length) + self.y
-		return point(x,y)
-		
 
 ##################################################################################################
 
@@ -50,7 +31,7 @@ def drawclock(drw):
 	hour = time.hour
 	if(hour>12):
 		hour = hour - 12
-	hourAngle = 360/12 * hour
+	hourAngle = (30 * hour) + (0.5 * time.minute) # 360/12 = 30
 	#draw the hour
 	drawHand(drw, hourAngle, 35, centerx, centery)
 	
@@ -73,6 +54,32 @@ def drawHand(drw, angle, length, centerx, centery):
 	# draw the polygon
 	drw.polygon((hepx, hepy, hemx, hemy,hex, hey),fill=0)
 	
+##################################################################################################
+
+# get the system uptime
+def getServerUpTime():
+	upminutes = 0
+	uphours = 0
+	updays = 0
+	
+	uptime = subprocess.check_output(['cat', '/proc/uptime']).decode('utf-8').split()[0]
+	uptime = long(float(uptime)) # convert to float, then to long int
+	upseconds = uptime % 60 # "subtract" the seconds from the time
+	uptime = int(uptime - upseconds) # ...
+	if(uptime>=60):
+		upminutes = uptime/60 # convert uptime to minutes
+		uptime = upminutes # ...
+		upminutes = uptime%60 # subtract the minutes from the uptime
+		uptime = uptime - upminutes # ...
+		if(uptime>=60):
+			uphours = uptime / 60 # get the hours
+			uptime = uphours
+			uphours=uptime%24
+			uptime=uptime-uphours
+			if(uptime>=24):
+				updays=uptime/24
+	upstring = str(updays)+"d"+str(uphours)+"h"+str(upminutes)+"m" # +":"+str(upseconds)
+	return upstring
 
 ##################################################################################################
 
@@ -124,7 +131,7 @@ disp.delay()
 print("..done")
 
 # font for drawing within PIL
-myfont10 = ImageFont.truetype("amiga_forever/amiga4ever.ttf", 12)
+myfont10 = ImageFont.truetype("amiga_forever/amiga4ever.ttf", 10)
 myfont18 = ImageFont.truetype("amiga_forever/amiga4ever.ttf", 18)
 myfont28 = ImageFont.truetype("amiga_forever/amiga4ever.ttf", 28)
 
@@ -141,15 +148,19 @@ absoluterefresh = 0
 while(1):
 	now = datetime.datetime.now()
 	# refresh all 30minutes completely
-	if(absoluterefresh > 1):
+	if(absoluterefresh > 10):
 		absoluterefresh = 0
-		disp.EPD_Dis_Part(0,295,0,127)
+		disp.Dis_Clear_full()
+		disp.delay()
+		disp.EPD_init_Part()
+		disp.delay()
 		actualmin = -1
 		print "..done"
 		
 	# redraw if minute changes
 	if(actualmin != now.minute):
-		print("minute changed")
+		getServerUpTime()
+		print("minute changed %2d:%2d",now.hour, now.minute)
 		actualmin = now.minute
 		absoluterefresh += 1
 		draw.rectangle([0,0,296,128], fill=255)
@@ -168,11 +179,30 @@ while(1):
 		beserv="Webserver"
 		beserv2 = "by beni in 19"
 		tup = "Uptime:"
-		upt="0d:00:00"
+		
 		draw.text((tpx-10, tpy+5), beserv, fill = 0, font = myfont18)
 		draw.text((tpx, tpy+25), beserv2, fill = 0, font = myfont10)
-		draw.text((tpx, tpy+50), tup, fill = 0, font = myfont10)
-		draw.text((tpx+10, tpy+70), upt, fill = 0, font = myfont10)
+		draw.text((tpx+40, tpy+50), tup, fill = 0, font = myfont10)
+		draw.text((tpx+40, tpy+70), getServerUpTime(), fill = 0, font = myfont10)
+
+		ref = str(10-absoluterefresh)
+		tpx = 260
+		tpy = 105
+		# draw the refresh count with an outline.
+		draw.text((tpx+2, tpy), ref, fill = 0, font = myfont18)
+		draw.text((tpx-2, tpy), ref, fill = 0, font = myfont18)
+		draw.text((tpx, tpy-2), ref, fill = 0, font = myfont18)
+		draw.text((tpx, tpy+2), ref, fill = 0, font = myfont18)
+
+		draw.text((tpx+2, tpy+2), ref, fill = 0, font = myfont18)
+		draw.text((tpx+2, tpy-2), ref, fill = 0, font = myfont18)
+		draw.text((tpx-2, tpy-2), ref, fill = 0, font = myfont18)
+		draw.text((tpx-2, tpy+2), ref, fill = 0, font = myfont18)
+
+		draw.text((tpx, tpy), ref, fill = 255, font = myfont18)
 		
+		# double the fun so it is more visible (?)
+		imageToDisplay()
 		disp.delay()
 		imageToDisplay()
+		disp.delay()
