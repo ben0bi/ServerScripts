@@ -15,7 +15,7 @@ from EPD_driver import EPD_driver
 def drawclock(drw):
 	centerx = 60
 	centery = 70
-	
+
 	# draw hour markers
 	r = 3
 	rc = 50
@@ -34,7 +34,7 @@ def drawclock(drw):
 	hourAngle = (30 * hour) + (0.5 * time.minute) # 360/12 = 30
 	#draw the hour
 	drawHand(drw, hourAngle, 35, centerx, centery)
-	
+
 	# get minute
 	minuteAngle = 360/60 * time.minute
 	drawHand(drw, minuteAngle, 55, centerx, centery)
@@ -53,7 +53,7 @@ def drawHand(drw, angle, length, centerx, centery):
 	hemy = centery-(math.sin(rad)*2)
 	# draw the polygon
 	drw.polygon((hepx, hepy, hemx, hemy,hex, hey),fill=0)
-	
+
 ##################################################################################################
 
 # get the system uptime
@@ -61,7 +61,7 @@ def getServerUpTime():
 	upminutes = 0
 	uphours = 0
 	updays = 0
-	
+
 	uptime = subprocess.check_output(['cat', '/proc/uptime']).decode('utf-8').split()[0]
 	uptime = long(float(uptime)) # convert to float, then to long int
 	upseconds = uptime % 60 # "subtract" the seconds from the time
@@ -147,7 +147,7 @@ absoluterefresh = 0
 
 while(1):
 	now = datetime.datetime.now()
-	# refresh all 30minutes completely
+	# refresh all 10 minutes completely
 	if(absoluterefresh > 10):
 		absoluterefresh = 0
 		disp.Dis_Clear_full()
@@ -156,7 +156,7 @@ while(1):
 		disp.delay()
 		actualmin = -1
 		print "..done"
-		
+
 	# redraw if minute changes
 	if(actualmin != now.minute):
 		getServerUpTime()
@@ -179,7 +179,7 @@ while(1):
 		beserv="Webserver"
 		beserv2 = "by beni in 19"
 		tup = "Uptime:"
-		
+
 		draw.text((tpx-10, tpy+5), beserv, fill = 0, font = myfont18)
 		draw.text((tpx, tpy+25), beserv2, fill = 0, font = myfont10)
 		draw.text((tpx+40, tpy+50), tup, fill = 0, font = myfont10)
@@ -200,7 +200,7 @@ while(1):
 		draw.text((tpx-2, tpy+2), ref, fill = 0, font = myfont18)
 
 		draw.text((tpx, tpy), ref, fill = 255, font = myfont18)
-		
+
 		# double the fun so it is more visible (?)
 		imageToDisplay()
 		disp.delay()
