@@ -6,6 +6,7 @@ python or python 3
 
 sudo apt-get install python-pip python3-pip
 sudo apt-get install libjpeg-dev
+sudp apt-get install python-requests
 
 pip install spidev
 pip install pillow

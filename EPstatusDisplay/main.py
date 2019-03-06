@@ -9,6 +9,10 @@ from StringIO import StringIO
 
 from EPD_driver import EPD_driver
 
+# font for drawing within PIL
+fontBig = ImageFont.truetype("fonts/sf_pixelate/SFPixelate.ttf", 24)
+fontNormal = ImageFont.truetype("fonts/sf_pixelate/SFPixelate-Bold.ttf", 15)
+
 ##################################################################################################
 
 # draw a 12h analog clock
@@ -119,8 +123,9 @@ disp = EPD_driver(spi = SPI.SpiDev(bus, device))
 print('ben0bi server display script.')
 print("by beni @ 19")
 print("ben0bi.dlinkddns.com")
+print("github.com/ben0bi")
+print("benis-bastelschuppen.github.io")
 print("--> disp size : %dx%d"%(disp.xDot, disp.yDot))
-
 print('------------init and clear full screen------------')
 disp.Dis_Clear_full()
 disp.delay()
@@ -129,11 +134,6 @@ disp.delay()
 disp.EPD_init_Part()
 disp.delay()
 print("..done")
-
-# font for drawing within PIL
-myfont10 = ImageFont.truetype("amiga_forever/amiga4ever.ttf", 10)
-myfont18 = ImageFont.truetype("amiga_forever/amiga4ever.ttf", 18)
-myfont28 = ImageFont.truetype("amiga_forever/amiga4ever.ttf", 28)
 
 # mainimg is used as screen buffer, all image composing/drawing is done in PIL,
 # the mainimg is then copied to the display (drawing on the disp itself is no fun)
@@ -159,8 +159,8 @@ while(1):
 
 	# redraw if minute changes
 	if(actualmin != now.minute):
-		getServerUpTime()
-		print("minute changed %2d:%2d",now.hour, now.minute)
+		uptime = getServerUpTime()
+		print("minute changed "+str(now.hour)+":"+str(now.minute))
 		actualmin = now.minute
 		absoluterefresh += 1
 		draw.rectangle([0,0,296,128], fill=255)
@@ -171,35 +171,35 @@ while(1):
 		# draw the time (digital)
 		#tpx = 120
 		#tpy = 96
-		#draw.text((tpx  , tpy  ), tstr, fill=0, font=myfont28)
+		#draw.text((tpx  , tpy  ), tstr, fill=0, font=fontNormal)
 
-		# draw the uptime
+		# draw the info texts
 		tpx = 120
 		tpy = 10
-		beserv="Webserver"
+		beserv="Netzdiener"
 		beserv2 = "by beni in 19"
 		tup = "Uptime:"
 
-		draw.text((tpx-10, tpy+5), beserv, fill = 0, font = myfont18)
-		draw.text((tpx, tpy+25), beserv2, fill = 0, font = myfont10)
-		draw.text((tpx+40, tpy+50), tup, fill = 0, font = myfont10)
-		draw.text((tpx+40, tpy+70), getServerUpTime(), fill = 0, font = myfont10)
+		draw.text((tpx-10, tpy+5), beserv, fill = 0, font = fontBig)
+		draw.text((tpx, tpy+25), beserv2, fill = 0, font = fontNormal)
+		draw.text((tpx+40, tpy+50), tup, fill = 0, font = fontNormal)
+		draw.text((tpx+40, tpy+70), uptime, fill = 0, font = fontNormal)
 
 		ref = str(10-absoluterefresh)
 		tpx = 260
 		tpy = 105
 		# draw the refresh count with an outline.
-		draw.text((tpx+2, tpy), ref, fill = 0, font = myfont18)
-		draw.text((tpx-2, tpy), ref, fill = 0, font = myfont18)
-		draw.text((tpx, tpy-2), ref, fill = 0, font = myfont18)
-		draw.text((tpx, tpy+2), ref, fill = 0, font = myfont18)
+		draw.text((tpx+2, tpy), ref, fill = 0, font = fontNormal)
+		draw.text((tpx-2, tpy), ref, fill = 0, font = fontNormal)
+		draw.text((tpx, tpy-2), ref, fill = 0, font = fontNormal)
+		draw.text((tpx, tpy+2), ref, fill = 0, font = fontNormal)
 
-		draw.text((tpx+2, tpy+2), ref, fill = 0, font = myfont18)
-		draw.text((tpx+2, tpy-2), ref, fill = 0, font = myfont18)
-		draw.text((tpx-2, tpy-2), ref, fill = 0, font = myfont18)
-		draw.text((tpx-2, tpy+2), ref, fill = 0, font = myfont18)
+		draw.text((tpx+2, tpy+2), ref, fill = 0, font = fontNormal)
+		draw.text((tpx+2, tpy-2), ref, fill = 0, font = fontNormal)
+		draw.text((tpx-2, tpy-2), ref, fill = 0, font = fontNormal)
+		draw.text((tpx-2, tpy+2), ref, fill = 0, font = fontNormal)
 
-		draw.text((tpx, tpy), ref, fill = 255, font = myfont18)
+		draw.text((tpx, tpy), ref, fill = 255, font = fontNormal)
 
 		# double the fun so it is more visible (?)
 		imageToDisplay()
