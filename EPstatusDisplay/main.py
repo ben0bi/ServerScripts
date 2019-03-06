@@ -117,6 +117,10 @@ def imageToDisplay():
 
 ##################################################################################################
 
+stt = datetime.datetime.now()
+startuptext = "boot: %02d.%02d.%04d"%(stt.day,stt.month, stt.year)
+startuptext2= "%02d:%02d"%(stt.hour,stt.minute)
+
 bus = 0
 device = 0
 disp = EPD_driver(spi = SPI.SpiDev(bus, device))
@@ -159,7 +163,6 @@ while(1):
 
 	# redraw if minute changes
 	if(actualmin != now.minute):
-		uptime = getServerUpTime()
 		print("minute changed "+str(now.hour)+":"+str(now.minute))
 		actualmin = now.minute
 		absoluterefresh += 1
@@ -178,16 +181,19 @@ while(1):
 		tpy = 10
 		beserv="Netzdiener"
 		beserv2 = "by beni in 19"
-		tup = "Uptime:"
+		uptime = getServerUpTime()
+		tup = "Up: "+uptime
 
 		draw.text((tpx-10, tpy+5), beserv, fill = 0, font = fontBig)
 		draw.text((tpx, tpy+25), beserv2, fill = 0, font = fontNormal)
-		draw.text((tpx+40, tpy+50), tup, fill = 0, font = fontNormal)
-		draw.text((tpx+40, tpy+70), uptime, fill = 0, font = fontNormal)
+		draw.text((tpx, tpy+50), tup, fill = 0, font = fontNormal)
+		#draw.text((tpx+40, tpy+70), uptime, fill = 0, font = fontNormal)
+		draw.text((tpx, tpy+70),startuptext, fill = 0, font=fontNormal)
+		draw.text((tpx+105, tpy+90),startuptext2, fill = 0, font=fontNormal)
 
 		ref = str(10-absoluterefresh)
-		tpx = 260
-		tpy = 105
+		tpx = 55
+		tpy = 90
 		# draw the refresh count with an outline.
 		draw.text((tpx+2, tpy), ref, fill = 0, font = fontNormal)
 		draw.text((tpx-2, tpy), ref, fill = 0, font = fontNormal)
