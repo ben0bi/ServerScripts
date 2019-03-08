@@ -1,4 +1,3 @@
 #!/bin/bash
 echo "Starting new screen for display script."
-screen python main.py
-
+sudo screen -mdS "DisplayScript" python main.py
