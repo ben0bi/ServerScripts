@@ -10,7 +10,7 @@ from StringIO import StringIO
 from EPD_driver import EPD_driver
 
 # font for drawing within PIL
-fontBig = ImageFont.truetype("fonts/sf_pixelate/SFPixelate.ttf", 24)
+fontBig = ImageFont.truetype("fonts/3dPixelFont.ttf", 70)
 fontNormal = ImageFont.truetype("fonts/sf_pixelate/SFPixelate-Bold.ttf", 15)
 
 ##################################################################################################
@@ -118,8 +118,8 @@ def imageToDisplay():
 ##################################################################################################
 
 stt = datetime.datetime.now()
-startuptext = "boot: %02d.%02d.%04d"%(stt.day,stt.month, stt.year)
-startuptext2= "%02d:%02d"%(stt.hour,stt.minute)
+startuptext = "on: %02d.%02d.%04d %02d:%02d"%(stt.day,stt.month, stt.year,stt.hour,stt.minute)
+#startuptext2= "%02d:%02d"%(stt.hour,stt.minute)
 
 bus = 0
 device = 0
@@ -165,6 +165,8 @@ while(1):
 	if(actualmin != now.minute):
 		print("minute changed "+str(now.hour)+":"+str(now.minute))
 		actualmin = now.minute
+		datetext = "%02d.%02d"%(stt.day,stt.month)
+		yeartext = "%04d"%(stt.year)
 		absoluterefresh += 1
 		draw.rectangle([0,0,296,128], fill=255)
 		drawclock(draw)
@@ -179,17 +181,16 @@ while(1):
 		# draw the info texts
 		tpx = 120
 		tpy = 10
-		beserv="Netzdiener"
-		beserv2 = "by beni in 19"
+		#beserv="Netzdiener"
+		#beserv2 = "by beni in 19"
 		uptime = getServerUpTime()
-		tup = "Up: "+uptime
+		tup = "up: "+uptime
 
-		draw.text((tpx-10, tpy+5), beserv, fill = 0, font = fontBig)
-		draw.text((tpx, tpy+25), beserv2, fill = 0, font = fontNormal)
-		draw.text((tpx, tpy+50), tup, fill = 0, font = fontNormal)
-		#draw.text((tpx+40, tpy+70), uptime, fill = 0, font = fontNormal)
-		draw.text((tpx, tpy+70),startuptext, fill = 0, font=fontNormal)
-		draw.text((tpx+105, tpy+90),startuptext2, fill = 0, font=fontNormal)
+		draw.text((tpx-20, 20),startuptext, fill = 0, font=fontNormal)
+		draw.text((tpx+10, 40),datetext, fill = 0, font=fontBig)
+		draw.text((tpx+110, 90), yeartext, fill = 0, font = fontNormal)
+#		draw.text((tpx, tpy+25), "by beni in 19", fill = 0, font = fontNormal)
+		draw.text((tpx-20, 110), tup, fill = 0, font = fontNormal)
 
 		ref = str(10-absoluterefresh)
 		tpx = 55

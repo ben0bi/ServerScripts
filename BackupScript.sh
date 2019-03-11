@@ -18,8 +18,13 @@ echo "All files synced."
 echo "Removing mirror files.."
 rm -r "$USB/MIRROR"
 mkdir "$USB/MIRROR"
+echo "Removing serverscript files.."
+rm -r "$USB/ServerScripts"
+mkdir "$USB/ServerScripts"
 echo "Copy mirror files.."
 cp -r /var/www/html/* "$USB/MIRROR"
+echo "Copy serverscript files.."
+cp -r /home/pi/ServerScripts/** "$USB/ServerScripts"
 
 # Again, GIMLI does not use SQL
 #echo "Removing overhead SQL..."
