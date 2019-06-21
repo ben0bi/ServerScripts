@@ -99,6 +99,7 @@ def imageToDisplay():
 	im = mainimg.transpose(Image.ROTATE_90)
 	listim = list(im.getdata())
 	listim2 = []
+
 	for y in range(0, im.size[1]):
 		for x in range(0, im.size[0]/8):
 			val = 0
@@ -112,7 +113,15 @@ def imageToDisplay():
 		listim2.append(0)
 	ypos = 0
 	xpos = 0
+
+	# first clear the screen, no delays.
+	disp.Dis_Clear_part(xpos, xpos+im.size[0]-1, ypos, ypos+im.size[1]-1)
+
+	# then draw the image itself. Three times.
 	disp.EPD_Dis_Part(xpos, xpos+im.size[0]-1, ypos, ypos+im.size[1]-1, listim2)
+	disp.EPD_Dis_Part(xpos, xpos+im.size[0]-1, ypos, ypos+im.size[1]-1, listim2)
+	disp.EPD_Dis_Part(xpos, xpos+im.size[0]-1, ypos, ypos+im.size[1]-1, listim2)
+	disp.delay()
 	uploadtime = time.time()
 
 ##################################################################################################
@@ -142,6 +151,7 @@ print("..done")
 # mainimg is used as screen buffer, all image composing/drawing is done in PIL,
 # the mainimg is then copied to the display (drawing on the disp itself is no fun)
 mainimg = Image.new("1", (296,128))
+
 draw = ImageDraw.Draw(mainimg)
 
 # main loop
@@ -165,8 +175,8 @@ while(1):
 	if(actualmin != now.minute):
 		print("minute changed "+str(now.hour)+":"+str(now.minute))
 		actualmin = now.minute
-		datetext = "%02d.%02d"%(stt.day,stt.month)
-		yeartext = "%04d"%(stt.year)
+		datetext = "%02d.%02d"%(now.day,now.month)
+		yeartext = "%04d"%(now.year)
 		absoluterefresh += 1
 		draw.rectangle([0,0,296,128], fill=255)
 		drawclock(draw)
@@ -208,8 +218,5 @@ while(1):
 
 		draw.text((tpx, tpy), ref, fill = 255, font = fontNormal)
 
-		# double the fun so it is more visible (?)
-		imageToDisplay()
-		disp.delay()
 		imageToDisplay()
 		disp.delay()
